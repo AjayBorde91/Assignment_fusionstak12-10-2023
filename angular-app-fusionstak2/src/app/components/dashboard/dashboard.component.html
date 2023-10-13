@@ -1,0 +1,145 @@
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<header style="float: right; padding-top: 5px;">
+    <div class="dropdown">
+        <button class="dropdown-button" (click)="toggleDropdown()">Welcome User {{fullName}}<i
+                class="fa fa-address-book"></i></button>
+        <div class="dropdown-content" [ngClass]="{'show-dropdown': isDropdownOpen}">
+            <a (click)="openeditdialog()"> <i class='fas fa-user-alt'></i> Edit Profile </a>
+            <a (click)="logout()"> <i class="fa fa-share-square-o"></i> Log Out</a>
+        </div>
+    </div>
+</header>
+<div id="canvas-left">
+    <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling"
+        aria-controls="offcanvasScrolling">
+        <i class='fas fa-bars' style='font-size:24px;margin-left:15px;float: left;'></i>
+    </button>
+
+    <div class="offcanvas offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel"
+        style="width: 215px; background-color: #1C266B;">
+        <div class="offcanvas-header">
+            <img id="logo" class="rounded-0" src="assets\images\Fusionstaklogo.png">
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+                style="background-color: white;"></button>
+        </div>
+        <div class="offcanvas-body">
+            <p id="administration">Administration</p>
+            <p id="mangusr"> <i class='fas fa-user-alt'></i> manage user</p>
+        </div>
+    </div>
+
+
+
+    <div>
+        <div>
+            <div class="row text-overlay">
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap pt-1 pb-0 mb-0">
+                        <h3 class="h2 mt-2" style="color: #000000;">Manage User</h3>
+                        <div class="d-flex justify-content-center">
+                            <div class="input-group custom-input-group">
+                                <table>
+                                    <tr>
+                                        <td class="col-lg-12">
+                                            <input type="search" class="form-control rounded custom-input searchInput"
+                                                placeholder="Search" aria-label="Search" aria-describedby="search-addon"
+                                                [(ngModel)]="searchTerm" />
+                                        </td>
+                                        <td class="col-lg-6">
+                                            <button id="searchbutton" type="button"
+  class="btn btn-outline-primary custom-button" style="margin-top: -2.5px;"
+  (click)="performSearch()">Search
+</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="btn-toolbar">
+                            <div class="btn-group">
+                                <button id="addnewuserbtn" type="button" class="btn btn-sm btn-outline-secondary"
+                                    (click)="opendialog()">+ Add new user</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table" style="float: left;">
+                            <thead>
+                                <tr id="tblheading">
+                                    <th scope="col" (click)="sortUsersByFirstName()">Firstname</th>
+                                    <th scope="col">Lastname</th>
+                                    <th scope="col">Email</th>
+                                    <ng-container *ngIf="role==='Admin'"><th scope="col">Action</th></ng-container>
+                                    <ng-container *ngIf="role==='Admin'"><th scope="col">Status</th></ng-container>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of paginatedUsers | filterUsers: searchTerm; let i = index">
+                                    <td>{{user.firstName}}</td>
+                                    <td>{{user.lastName}}</td>
+                                    <td>{{user.username}}</td>
+                                    <ng-container *ngIf="role==='Admin'">
+                                    <td><i class="fas fa-edit" (click)="opendialog()"></i>
+                                        <i class='fas fa-key' style='padding-left: 10px;'></i>
+                                        <i data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo" class='fas fa-trash-alt' style='color:#ff0000 ;padding-left: 10px;' (click)="deleteUser(user.username)" ></i>
+                                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title text-dark" id="exampleModalLabel">User Deleted Successfully.</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="form-check form-switch">
+                                          <input class="form-check-input" type="checkbox" [(ngModel)]="user.isActive" (change)="onUserActivityChange(user)" id="flexSwitchCheck{{user.username}}">
+                                        </div>
+                                      </td>
+                                      
+                                </ng-container>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                   
+
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-left">
+                            <li class="page-item" [ngClass]="{ 'disabled': currentPage === 1 }">
+                                <a class="page-link" href="javascript:void(0);" (click)="prevPage()">Previous</a>
+                            </li>
+                            <li class="page-item" *ngFor="let page of pages"
+                                [ngClass]="{ 'active': currentPage === page }">
+                                <a class="page-link" href="javascript:void(0);" (click)="gotoPage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" [ngClass]="{ 'disabled': currentPage === totalPages }">
+                                <a class="page-link" href="javascript:void(0);" (click)="nextPage()">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </main>
+            </div>
+        </div>
+    </div>
+</div>
